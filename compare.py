@@ -2,9 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-# ==========================================
-# 0. CÁC HÀM HỖ TRỢ TỰ CÀI ĐẶT (BACKEND)
-# ==========================================
 
 def back_substitution(R, d):
     """Giải hệ phương trình tam giác trên Rx = d"""
@@ -19,7 +16,6 @@ def back_substitution(R, d):
     return x
 
 def gaussian_elimination(A, b):
-    """Tự cài đặt giải hệ Ax = b bằng khử Gauss (dùng cho Normal Equation)"""
     n = len(b)
     M = np.hstack((A.astype(float), b.reshape(-1, 1).astype(float)))
     
@@ -36,12 +32,7 @@ def gaussian_elimination(A, b):
             
     return back_substitution(M[:, :-1], M[:, -1])
 
-# ==========================================
-# 1. CÀI ĐẶT 3 PHƯƠNG PHÁP GIẢI (SELF-IMPLEMENT)
-# ==========================================
-
 def householder_qr_solver(A, b):
-    """Giải LS bằng QR dùng phản xạ Householder (Tự cài đặt)"""
     m, n = A.shape
     R = A.copy().astype(float)
     Q = np.eye(m)
@@ -52,20 +43,18 @@ def householder_qr_solver(A, b):
         if norm_x < 1e-15: continue
             
         v = x.copy()
-        # Công thức ổn định số học: chọn dấu ngược với phần tử đầu
         v[0] += np.sign(x[0]) * norm_x
         v /= np.linalg.norm(v)
         
-        # Cập nhật R: R = H*R
+        # R = H*R
         R[k:, k:] -= 2 * np.outer(v, np.dot(v, R[k:, k:]))
-        # Cập nhật Q: Q = Q*H
+        # Q = Q*H
         Q[:, k:] -= 2 * np.outer(np.dot(Q[:, k:], v), v)
         
     d = np.dot(Q.T, b)
     return back_substitution(R[:n, :n], d[:n])
 
 def gram_schmidt_qr_solver(A, b):
-    """Giải LS bằng QR dùng Modified Gram-Schmidt (Tự cài đặt)"""
     m, n = A.shape
     Q = np.zeros((m, n))
     R = np.zeros((n, n))
@@ -83,15 +72,12 @@ def gram_schmidt_qr_solver(A, b):
     return back_substitution(R, d)
 
 def normal_equation_solver(A, b):
-    """Giải bằng Phương trình chuẩn: (A^T A) x = A^T b (Tự cài đặt)"""
     ATA = A.T @ A
     ATb = A.T @ b
     return gaussian_elimination(ATA, ATb)
 
-# ==========================================
-# 2. HÀM HỖ TRỢ SINH DỮ LIỆU
-# ==========================================
 
+# HÀM HỖ TRỢ SINH DỮ LIỆU
 def generate_ill_conditioned_matrix(m, n, cond_num):
     """Tạo ma trận có số điều kiện cụ thể"""
     X = np.random.randn(m, n)
@@ -101,10 +87,8 @@ def generate_ill_conditioned_matrix(m, n, cond_num):
     A = U @ np.diag(s) @ V.T
     return A
 
-# ==========================================
-# 3. THỰC NGHIỆM ĐÁNH GIÁ
-# ==========================================
 
+#thực nghiệm và đánh giá
 def run_stability_experiment():
     print("--- 1. Đánh giá ĐỘ ỔN ĐỊNH (Stability) ---")
     m, n = 100, 20
@@ -176,4 +160,5 @@ def run_time_experiment():
 if __name__ == "__main__":
     np.random.seed(42)
     run_stability_experiment()
+
     run_time_experiment()
