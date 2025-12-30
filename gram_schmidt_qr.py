@@ -13,12 +13,6 @@ def back_substitution(R, d):
             sum_val = np.dot(R[i, i+1:], x[i+1:])
             x[i] = (d[i] - sum_val) / R[i, i]
     return x
-
-def gram_schmidt_qr_solver(A, b):
-    """
-    Giải bài toán bình phương tối thiểu bằng Modified Gram-Schmidt.
-    Ổn định hơn Gram-Schmidt cổ điển nhưng kém Householder một chút.
-    """
     m, n = A.shape
     Q = np.zeros((m, n))
     R = np.zeros((n, n))
@@ -37,14 +31,11 @@ def gram_schmidt_qr_solver(A, b):
                 R[i, j] = np.dot(Q[:, i], V[:, j])
                 V[:, j] -= R[i, j] * Q[:, i]
                 
-    # Với Gram-Schmidt: Q.shape = (m, n) và R.shape = (n, n)
-    # Nghiệm được tìm qua: Rx = Q.T * b
+    # Rx = Q.T * b
     d = np.dot(Q.T, b)
     return back_substitution(R, d)
 
-# --- Chạy thử nghiệm ---
 if __name__ == "__main__":
-    # Tạo dữ liệu mẫu: m > n
     A_sample = np.array([[1, 2], [3, 4], [5, 6]], dtype=float)
     b_sample = np.array([7, 8, 9], dtype=float)
     
@@ -53,6 +44,6 @@ if __name__ == "__main__":
     print("--- Kết quả giải bằng Gram-Schmidt QR ---")
     print(f"Nghiệm x: {x_sol}")
     
-    # Kiểm tra lại bằng thư viện numpy
     x_np, _, _, _ = np.linalg.lstsq(A_sample, b_sample, rcond=None)
+
     print(f"Nghiệm từ numpy.linalg.lstsq: {x_np}")
